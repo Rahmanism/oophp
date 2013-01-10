@@ -26,8 +26,8 @@ include('MySqlDb.php');
 $db = new MySqlDb('localhost', 'root', '110110', 'test');
 $rows = $db->Query('select * from posts');
 
-$db->Where('id', 3);
-$db->Get('posts');
+//$db->Where('id', 3);
+$rows = $db->Get('posts', 2);
 ?>
 <!doctype html>
 <html>
@@ -43,7 +43,6 @@ $db->Get('posts');
         }
 
 //                echo '<pre>'; print_r($rows); echo '</pre>';
-
         ?>
     </body>
 </html>

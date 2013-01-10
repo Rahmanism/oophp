@@ -37,6 +37,10 @@ class MySqlDb {
     function Get($tableName, $numRows = NULL) {
         $this->_query = "select * from $tableName";
         $stmt = $this->_BuildQuery($numRows);
+        $results = $stmt->execute();
+
+        $results = $this->_DynamicBindResults($stmt);
+        return $results;
     }
 
     function Insert($tableName, $insertData) {
@@ -61,22 +65,23 @@ class MySqlDb {
         }
         return $stmt;
     }
-    
+
     protected function _BuildQuery($numRows = NULL, $tableData = false) {
-        if ( gettype($tableData) === 'array' ) {
+        $hasTableData = false;
+        if (gettype($tableData) === 'array') {
             $hasTableData = true;
         }
-        
+
         // Did the user call the where method?
-        if ( !empty($this->_where) ) {
+        if (!empty($this->_where)) {
             $keys = array_keys($this->_where);
             $whereProp = $keys[0];
             $whereValue = $this->_where[$whereProp];
-            
+
             // if update data was passed, filter through and 
             // create the SQL query, accordingly.
             if ( $hasTableData ) {
-                foreach ( $tableData as $prop => $value ) {
+                foreach ($tableData as $prop => $value) {
                     // 
                 }
             } else { // no table data was passed. Might be a SELECT statement.
@@ -84,14 +89,24 @@ class MySqlDb {
                 $this->_query .= " where $whereProp = ?";
             }
         }
-        
-        if ( isset($numRows) ) {
-            $this->_query .= " limit " . (int)$numRows;
+
+        // Did the user set a limit?
+        if (isset($numRows)) {
+            $this->_query .= " limit " . (int) $numRows;
         }
+
+        $stmt = $this->_PrepareQuery();
+
+        // Bind parameters
+        if ($this->_where) {
+            $stmt->bind_param($this->_paramTypeList, $whereValue);
+        }
+
+        return $stmt;
     }
-    
+
     protected function _DetermineType($item) {
-        switch ( gettype($item) ) {
+        switch (gettype($item)) {
             case 'string' :
                 $paramType = 's';
                 break;
@@ -105,7 +120,7 @@ class MySqlDb {
                 $paramType = 'd';
                 break;
         }
-        
+
         return $paramType;
     }
 
