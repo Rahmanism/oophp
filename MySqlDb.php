@@ -35,7 +35,8 @@ class MySqlDb {
     }
 
     function Get($tableName, $numRows = NULL) {
-        
+        $this->_query = "select * from $tableName";
+        $stmt = $this->_BuildQuery($numRows);
     }
 
     function Insert($tableName, $insertData) {
@@ -46,12 +47,12 @@ class MySqlDb {
         
     }
 
-    function Delete($tableName) {
+    public function Delete($tableName) {
         
     }
 
-    function Where($whereProp, $whereValue) {
-        
+    public function Where($whereProp, $whereValue) {
+        $this->_where[$whereProp] = $whereValue;
     }
 
     protected function _PrepareQuery() {
@@ -59,6 +60,53 @@ class MySqlDb {
             trigger_error('Problem preparing query', E_USER_ERROR);
         }
         return $stmt;
+    }
+    
+    protected function _BuildQuery($numRows = NULL, $tableData = false) {
+        if ( gettype($tableData) === 'array' ) {
+            $hasTableData = true;
+        }
+        
+        // Did the user call the where method?
+        if ( !empty($this->_where) ) {
+            $keys = array_keys($this->_where);
+            $whereProp = $keys[0];
+            $whereValue = $this->_where[$whereProp];
+            
+            // if update data was passed, filter through and 
+            // create the SQL query, accordingly.
+            if ( $hasTableData ) {
+                foreach ( $tableData as $prop => $value ) {
+                    // 
+                }
+            } else { // no table data was passed. Might be a SELECT statement.
+                $this->_paramTypeList = $this->_DetermineType($whereValue);
+                $this->_query .= " where $whereProp = ?";
+            }
+        }
+        
+        if ( isset($numRows) ) {
+            $this->_query .= " limit " . (int)$numRows;
+        }
+    }
+    
+    protected function _DetermineType($item) {
+        switch ( gettype($item) ) {
+            case 'string' :
+                $paramType = 's';
+                break;
+            case 'integer' :
+                $paramType = 'i';
+                break;
+            case 'blob' :
+                $paramType = 'b';
+                break;
+            case 'double' :
+                $paramType = 'd';
+                break;
+        }
+        
+        return $paramType;
     }
 
     /**

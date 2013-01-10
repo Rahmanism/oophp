@@ -25,6 +25,9 @@
 include('MySqlDb.php');
 $db = new MySqlDb('localhost', 'root', '110110', 'test');
 $rows = $db->Query('select * from posts');
+
+$db->Where('id', 3);
+$db->Get('posts');
 ?>
 <!doctype html>
 <html>
