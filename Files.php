@@ -8,10 +8,6 @@ class Files {
         echo self::$myVar;
     }
 
-    function __construct() {
-        
-    }
-
     private static $timesFileIsChecked = 0;
 
     public static function CheckImage($file) {
