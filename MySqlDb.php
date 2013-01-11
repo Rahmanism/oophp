@@ -44,7 +44,13 @@ class MySqlDb {
     }
 
     function Insert($tableName, $insertData) {
-        
+        $this->_query = "insert into $tableName";
+        $stmt = $this->_BuildQuery(NULL, $insertData);
+        $stmt->execute();
+
+        if ($stmt->affected_rows) {
+            return true;
+        }
     }
 
     function Update($tableName, $updateData) {
@@ -78,15 +84,46 @@ class MySqlDb {
             $whereProp = $keys[0];
             $whereValue = $this->_where[$whereProp];
 
-            // if update data was passed, filter through and 
+            // if data was passed, filter through and 
             // create the SQL query, accordingly.
-            if ( $hasTableData ) {
+            if ($hasTableData) {
+                $i = 1;
                 foreach ($tableData as $prop => $value) {
-                    // 
+                    echo $prop . ' ' . $value . '<Br>';
                 }
             } else { // no table data was passed. Might be a SELECT statement.
                 $this->_paramTypeList = $this->_DetermineType($whereValue);
                 $this->_query .= " where $whereProp = ?";
+            }
+        }
+        
+        // Determine if is INSERT query
+        if ($hasTableData) {
+            $pos = strpos($this->_query, 'insert');
+        }
+        
+        if ($pos !== false) {
+            // is INSERT statement
+            $keys = array_keys($tableData);
+            $values = array_values($tableData);
+            $num = count($keys);
+            
+            if ($num > 0) {
+                // wrap values in quotes
+                foreach ($values as $key => $value) {
+                    $values[$key] = "'{value}'";
+                    $this->_paramTypeList .= $this->_DetermineType($value);
+                }
+
+                $this->_query .= ' (' . implode($keys, ', ') . ')';
+                $this->_query .= ' values (';
+
+                while ($num > 1) {
+                    //$this->_query .=  ($num !== 1) ? '?, ' : '?)';
+                    $this->_query .=  '?, ';
+                    $num--;
+                }
+                $this->_query .= '?)';
             }
         }
 
@@ -98,7 +135,16 @@ class MySqlDb {
         $stmt = $this->_PrepareQuery();
 
         // Bind parameters
-        if ($this->_where) {
+        if ($hasTableData) {
+            $args = array();
+            $args[] = $this->_paramTypeList;
+            
+            foreach ($tableData as $prop => $val) {
+                $args[] = &$tableData[$prop];
+            }
+            
+            call_user_func_array( array($stmt, 'bind_param'), $args);
+        } elseif ($this->_where) {
             $stmt->bind_param($this->_paramTypeList, $whereValue);
         }
 

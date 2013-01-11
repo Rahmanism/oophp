@@ -24,10 +24,20 @@
 
 include('MySqlDb.php');
 $db = new MySqlDb('localhost', 'root', '110110', 'test');
-$rows = $db->Query('select * from posts');
+//$rows = $db->Query('select * from posts');
 
 //$db->Where('id', 3);
-$rows = $db->Get('posts', 2);
+//$rows = $db->Get('posts', 2);
+
+$insertData = array(
+    'title' => 'Forth Inserted',
+    'body' => 'The forth body is here now'
+);
+
+if ($db->Insert('posts', $insertData))
+    echo 'successful insert';
+else
+    echo 'Insert operation was not successful.';
 ?>
 <!doctype html>
 <html>
@@ -37,10 +47,10 @@ $rows = $db->Get('posts', 2);
     </head>
     <body>
         <?php
-        foreach ($rows as $row) {
-            echo '<h2>' . $row['title'] . '</h2>';
-            echo '<p>' . $row['body'] . '</p>';
-        }
+//        foreach ($rows as $row) {
+//            echo '<h2>' . $row['title'] . '</h2>';
+//            echo '<p>' . $row['body'] . '</p>';
+//        }
 
 //                echo '<pre>'; print_r($rows); echo '</pre>';
         ?>
