@@ -26,18 +26,32 @@ include('MySqlDb.php');
 $db = new MySqlDb('localhost', 'root', '110110', 'test');
 //$rows = $db->Query('select * from posts');
 
-//$db->Where('id', 3);
-//$rows = $db->Get('posts', 2);
+//$db->Where('id', 31);
+////$rows = $db->Get('posts', 2);
+$rows = $db->Get('posts');
+//
+//$insertData = array(
+//    'title' => 'F Inserted',
+//    'body' => 'F The forth body is here now'
+//);
+//
+//if ($db->Insert('posts', $insertData))
+//    echo 'successful insert';
+//else
+//    echo 'Insert operation was not successful.';
+//
+//$updateData = array(
+//    'title' => 'O0 Updated Title',
+//    'body' => 'O0O This is the updated body.'
+//);
+//$db->Where('id', 31);
+//$results = $db->Update('posts', $updateData);
+//
+//echo ($results) ? 'updated.' : 'no updated.';
 
-$insertData = array(
-    'title' => 'Forth Inserted',
-    'body' => 'The forth body is here now'
-);
+//$db->Where('id', 30);
+//if ($db->Delete('posts')) echo 'deleted.';
 
-if ($db->Insert('posts', $insertData))
-    echo 'successful insert';
-else
-    echo 'Insert operation was not successful.';
 ?>
 <!doctype html>
 <html>
@@ -47,10 +61,10 @@ else
     </head>
     <body>
         <?php
-//        foreach ($rows as $row) {
-//            echo '<h2>' . $row['title'] . '</h2>';
-//            echo '<p>' . $row['body'] . '</p>';
-//        }
+        foreach ($rows as $row) {
+            echo '<h2>' . $row['title'] . '</h2>';
+            echo '<p>' . $row['body'] . '</p>';
+        }
 
 //                echo '<pre>'; print_r($rows); echo '</pre>';
         ?>
