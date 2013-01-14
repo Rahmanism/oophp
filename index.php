@@ -65,7 +65,6 @@ $rows = $db->Get('posts');
             echo '<h2>' . $row['title'] . '</h2>';
             echo '<p>' . $row['body'] . '</p>';
         }
-
 //                echo '<pre>'; print_r($rows); echo '</pre>';
         ?>
     </body>
